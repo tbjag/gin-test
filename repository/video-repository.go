@@ -2,28 +2,29 @@ package repository
 
 import (
 	"example/web-service-gin/entity"
-	"log"
 
-	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 type VideoRepository interface {
 	Save(video entity.Video)
+	Update(video entity.Video)
+	Delete(video entity.Video)
 	FindAll() []entity.Video
 	CloseDB()
 }
 
 type database struct {
-	connection *sqlx.DB
+	connection *gorm.DB
 }
 
 func NewVideoRepository() VideoRepository {
-	db, err := sqlx.Connect("sqlite3", ":memory:")
+	db, err := gorm.Open("sqlite3", "test.db")
 	if err != nil {
-		log.Fatal(err)
+		panic("Failed to connect database")
 	}
-
+	db.AutoMigrate(&entity.Video{}, &entity.Person{})
 	return &database{
 		connection: db,
 	}
@@ -36,24 +37,20 @@ func (db *database) CloseDB() {
 	}
 }
 
-func (db *database) Save(video entity.Video) error {
-	_, err := db.NamedExec(`
-		INSERT INTO videos (title, description, url, person_id, created_at, updated_at)
-		VALUES (:title, :description, :url, :person_id, :created_at, :updated_at)`,
-		&video)
-	if err != nil {
-		return err
-	}
+func (db *database) Save(video entity.Video) {
+	db.connection.Create(&video)
+}
 
-	return nil
+func (db *database) Update(video entity.Video) {
+	db.connection.Save(&video)
+}
+
+func (db *database) Delete(video entity.Video) {
+	db.connection.Delete(&video)
 }
 
 func (db *database) FindAll() []entity.Video {
 	var videos []entity.Video
-	err := db.Select(&videos, "SELECT * FROM videos")
-	if err != nil {
-		panic("Failed to close database")
-	}
-
+	db.connection.Set("gorm:auto_preload", true).Find(&videos)
 	return videos
 }
