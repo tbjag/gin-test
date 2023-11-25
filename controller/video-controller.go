@@ -9,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type VideoController interface {
-	FindAll() []entity.Video
+type RecipeController interface {
+	FindAll() []entity.Recipe
 	Save(ctx *gin.Context) error
 	Update(ctx *gin.Context) error
 	Delete(ctx *gin.Context) error
@@ -18,32 +18,32 @@ type VideoController interface {
 }
 
 type controller struct {
-	service service.VideoService
+	service service.RecipeService
 }
 
-func New(service service.VideoService) VideoController {
+func New(service service.RecipeService) RecipeController {
 	return &controller{
 		service: service,
 	}
 }
 
-func (c *controller) FindAll() []entity.Video {
+func (c *controller) FindAll() []entity.Recipe {
 	return c.service.FindAll()
 }
 
 func (c *controller) Save(ctx *gin.Context) error {
-	var video entity.Video
-	err := ctx.ShouldBindJSON(&video)
+	var recipe entity.Recipe
+	err := ctx.ShouldBindJSON(&recipe)
 	if err != nil {
 		return err
 	}
-	c.service.Save(video)
+	c.service.Save(recipe)
 	return nil
 }
 
 func (c *controller) Update(ctx *gin.Context) error {
-	var video entity.Video
-	err := ctx.ShouldBindJSON(&video)
+	var recipe entity.Recipe
+	err := ctx.ShouldBindJSON(&recipe)
 	if err != nil {
 		return err
 	}
@@ -52,28 +52,28 @@ func (c *controller) Update(ctx *gin.Context) error {
 	if err != nil {
 		return err
 	}
-	video.ID = id
+	recipe.ID = id
 
-	c.service.Update(video)
+	c.service.Update(recipe)
 	return nil
 }
 
 func (c *controller) Delete(ctx *gin.Context) error {
-	var video entity.Video
+	var recipe entity.Recipe
 	id, err := strconv.ParseUint(ctx.Param("id"), 0, 0)
 	if err != nil {
 		return err
 	}
-	video.ID = id
-	c.service.Delete(video)
+	recipe.ID = id
+	c.service.Delete(recipe)
 	return nil
 }
 
 func (c *controller) ShowAll(ctx *gin.Context) {
-	videos := c.service.FindAll()
+	recipes := c.service.FindAll()
 	data := gin.H{
-		"title":  "Video Page",
-		"videos": videos,
+		"title":  "Recipe Page",
+		"recipes": recipes,
 	}
 	ctx.HTML(http.StatusOK, "index.html", data)
 }

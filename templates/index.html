@@ -7,11 +7,11 @@
     <div class="container">
         <div class="row">
             <!--Loop over the list of videos -->
-            {{range .videos }}
+            {{range .recipes }}
             <div class="col-md-4">
                 <div class="card mb-4 shadow-sm">
                     <div class="card-body">
-                        <iframe width="300" height="200" src="{{.URL}}" frameborder="0" allow="accelerometer; autoplay; 
+                        <iframe width="300" height="200" src="{{.ImageURL}}" frameborder="0" allow="accelerometer; autoplay; 
                             encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         <p class="card-text">
                         <h4>{{.Title}}</h4>

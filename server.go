@@ -11,16 +11,18 @@ import (
 )
 
 var (
-	videoRepository repository.VideoRepository = repository.NewVideoRepository()
-	videoService    service.VideoService       = service.New(videoRepository)
+	recipeRepository repository.RecipeRepository = repository.NewRecipeRepository()
+	recipeService    service.RecipeService       = service.New(recipeRepository)
 	loginService    service.LoginService       = service.NewLoginService()
 	jwtService      service.JWTService         = service.NewJWTService()
 
-	videoController controller.VideoController = controller.New(videoService)
+	recipeController controller.RecipeController = controller.New(recipeService)
 	loginController controller.LoginController = controller.NewLoginController(loginService, jwtService)
 )
 
 func main() {
+	defer recipeRepository.CloseDB()
+
 	server := gin.New()
 
 	server.Static("/css", "./templates/css")
@@ -43,12 +45,12 @@ func main() {
 // JWT Authorization Middleware applies to "/api" only.
 apiRoutes := server.Group("/api", middleware.AuthorizeJWT())
 {
-	apiRoutes.GET("/videos", func(ctx *gin.Context) {
-		ctx.JSON(200, videoController.FindAll())
+	apiRoutes.GET("/recipes", func(ctx *gin.Context) {
+		ctx.JSON(200, recipeController.FindAll())
 	})
 
-	apiRoutes.POST("/videos", func(ctx *gin.Context) {
-		err := videoController.Save(ctx)
+	apiRoutes.POST("/recipes", func(ctx *gin.Context) {
+		err := recipeController.Save(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
@@ -57,8 +59,8 @@ apiRoutes := server.Group("/api", middleware.AuthorizeJWT())
 
 	})
 
-	apiRoutes.PUT("/videos/:id", func(ctx *gin.Context) {
-		err := videoController.Update(ctx)
+	apiRoutes.PUT("/recipes/:id", func(ctx *gin.Context) {
+		err := recipeController.Update(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
@@ -67,8 +69,8 @@ apiRoutes := server.Group("/api", middleware.AuthorizeJWT())
 
 	})
 
-	apiRoutes.DELETE("/videos/:id", func(ctx *gin.Context) {
-		err := videoController.Delete(ctx)
+	apiRoutes.DELETE("/recipes/:id", func(ctx *gin.Context) {
+		err := recipeController.Delete(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
@@ -81,7 +83,7 @@ apiRoutes := server.Group("/api", middleware.AuthorizeJWT())
 
 	viewRoutes := server.Group("/view")
 	{
-		viewRoutes.GET("/videos", videoController.ShowAll)
+		viewRoutes.GET("/recipes", recipeController.ShowAll)
 	}
 
 	server.Run(":8080")

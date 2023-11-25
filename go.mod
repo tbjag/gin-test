@@ -9,4 +9,6 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
+	github.com/swaggo/files v1.0.1
+	github.com/swaggo/gin-swagger v1.6.0
 )
