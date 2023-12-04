@@ -75,5 +75,5 @@ func (c *controller) ShowAll(ctx *gin.Context) {
 		"title":  "Recipe Page",
 		"recipes": recipes,
 	}
-	ctx.HTML(http.StatusOK, "index.html", data)
+	ctx.HTML(http.StatusOK, "allrecipe.html", data)
 }
